@@ -17,10 +17,38 @@ export async function getGoogleSheets() {
       range: "aug!A1:K2000",
     });
     const datas = response.data.values;
-    const headline = datas[0];
+    const headline = [
+      datas[0][1],
+      datas[0][4],
+      datas[0][5],
+      datas[0][6],
+      datas[0][7],
+      datas[0][8],
+      datas[0][9],
+      datas[0][10],
+    ];
     const today = "2023-08-03"; //DateTime.now().toFormat("yyyy-Ll-dd");
     const selectedDatas = datas.filter((row) => row[2] === today);
-    return { headline, selectedDatas };
+    const todayDatas = selectedDatas.map((data) => [
+      data[1],
+      data[4],
+      data[5],
+      data[6],
+      data[7],
+      data[8] ?? "",
+      data[9] ?? "",
+      data[10] ?? "",
+    ]);
+
+    const suppliers = selectedDatas.map((row) => ({ supplierId: row[0], supplierNm: row[3] }));
+    const uniqueSuppliers = suppliers.reduce(function (acc, cur) {
+      if (acc.findIndex(({ supplierId }) => supplierId === cur.supplierId) === -1) {
+        acc.push(cur);
+      }
+      return acc;
+    }, []);
+
+    return { today, headline, todayDatas, uniqueSuppliers };
   } catch (err) {
     console.log(err);
   }
