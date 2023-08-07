@@ -1,5 +1,5 @@
-import CustomButton from "@/components/CustomButton";
 import Hero from "@/components/Hero";
+import Pannel from "@/components/Pannel";
 import { getGoogleSheets } from "@/libs/getGoogleSheets";
 import Head from "next/head";
 
@@ -16,19 +16,12 @@ export default function Home({ sheet }: any) {
           <div className="flex flex-col items-start justify-start gap-y-2.5 text-black-100">
             <section>
               <p className="text-[20px] text-black-100 font-light mt-5">[{sheet.today}]일 기준</p>
-              <div className="flex items-start justify-between gap-y-2.5 text-black-100">
+              <div className="grid xl:grid-cols-6 md:grid-cols-3 sm:grid-cols-2 gap-4 justify-between gap-y-5 text-black-100">
                 {sheet.uniqueSuppliers.map((supplier: any) => {
-                  return (
-                    <CustomButton
-                      title={supplier.supplierNm}
-                      key={supplier.supplierId}
-                      containerStyles="bg-sky-500 text-white rounded-full mt-10"
-                      handleClick={handleScroll}
-                    />
-                  );
+                  return <Pannel title={supplier.supplierNm} key={supplier.supplierId} handleClick={handleScroll} />;
                 })}
               </div>
-              <table className="min-w-full text-left text-sm font-light">
+              {/* <table className="min-w-full text-left text-sm font-light">
                 <thead className="border-b font-medium dark:border-neutral-500">
                   <tr>
                     {sheet.headline.map((item: any) => {
@@ -51,7 +44,7 @@ export default function Home({ sheet }: any) {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table> */}
             </section>
           </div>
         </div>

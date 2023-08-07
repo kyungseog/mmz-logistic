@@ -14,7 +14,7 @@ export async function getGoogleSheets() {
     const sheets = google.sheets({ version: "v4", auth: jwt });
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.SPREADSHEET_ID,
-      range: "aug!A1:K2000",
+      range: "data!A1:L10000",
     });
     const datas = response.data.values;
     const headline = [
