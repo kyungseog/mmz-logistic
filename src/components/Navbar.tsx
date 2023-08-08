@@ -7,14 +7,10 @@ const NavBar = () => (
   <header className="w-full absolute z-10">
     <nav className="max-w-[1440px] mx-auto flex justify-between items-center sm:px-16 px-6 py-4 bg-transparent">
       <Link href="/" className="flex justify-center items-center">
-        <Image src="/next.svg" alt="logo" width={118} height={18} className="object-contain" />
+        <Image src="/logo_kr_bk.png" alt="logo" width={118} height={18} className="object-contain" />
       </Link>
 
-      <CustomButton
-        title="Sign in"
-        btnType="button"
-        containerStyles="text-sky-500 rounded-full bg-white min-w-[130px]"
-      />
+      <CustomButton title="Sign in" btnType="button" containerStyles="text-black rounded-full bg-white min-w-[130px]" />
     </nav>
   </header>
 );

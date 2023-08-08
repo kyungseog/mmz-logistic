@@ -6,6 +6,7 @@ export interface CustomButtonProps {
   containerStyles?: string;
   textStyles?: string;
   title: string;
+  supplierId?: string;
   handleClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
