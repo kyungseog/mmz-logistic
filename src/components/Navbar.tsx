@@ -10,7 +10,11 @@ const NavBar = () => (
         <Image src="/logo_kr_bk.png" alt="logo" width={118} height={18} className="object-contain" />
       </Link>
 
-      <CustomButton title="Sign in" btnType="button" containerStyles="text-black rounded-full bg-white min-w-[130px]" />
+      <CustomButton
+        title="작성자등록"
+        btnType="button"
+        containerStyles="text-black rounded-full bg-white min-w-[130px]"
+      />
     </nav>
   </header>
 );
