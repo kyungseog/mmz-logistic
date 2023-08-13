@@ -6,7 +6,10 @@ export interface CustomButtonProps {
   containerStyles?: string;
   textStyles?: string;
   title: string;
-  supplierId?: string;
+  id?: string;
+  orderQuantity?: number;
+  inQuantity?: number;
+  filteredData?: any;
   handleClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
@@ -22,4 +25,6 @@ export interface SheetData {
   optionText: string;
   inQuantity: number;
   inIssueText: string;
+  imageUrl: string;
+  productCode: string;
 }
