@@ -6,9 +6,9 @@ import { SheetData } from "@/types";
 export default function Suppliers() {
   const router = useRouter();
   const datas = JSON.parse(router.query.filteredData);
-  const products = new Set(datas.map((row: SheetData) => row.productCode));
+  const products = new Set<string>(datas.map((row: SheetData) => row.productCode));
   const uniqueProducts = [...products];
-  console.log(uniqueProducts);
+
   const itemData = {
     barCode: "dd",
     orderQuantity: 3,
@@ -19,7 +19,9 @@ export default function Suppliers() {
     <div>
       <div className="flex xl:flex-row flex-col gap-5 relative z-0 max-w-[1440px] mx-auto">
         <div className="flex-1 pt-36 sm:px-16 px-6">
-          <h1 className="text-[50px] font-extrabold">[{datas[0].supplierNm}]</h1>
+          <h1 className="text-[30px] font-extrabold">
+            [{datas[0].supplierNm}]<span className="font-normal ms">주문상품수: pcs / 확인완료수: pcs </span>
+          </h1>
         </div>
       </div>
       <div className="mt-12 sm:px-16 px-6 py-4 max-w-[1440px] mx-auto">
