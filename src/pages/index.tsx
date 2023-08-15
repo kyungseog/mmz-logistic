@@ -1,56 +1,84 @@
-import Hero from "@/components/Hero";
-import { getInQuantityData } from "@/libs/getGoogleSheets";
-import { SheetData } from "@/types";
-import Link from "next/link";
+import SupplierList from "@/components/SupplierList";
+import { getCheckerList, getInQuantityData } from "@/libs/getGoogleSheets";
+import NavBar from "@/components/Navbar";
+import { RadioGroup } from "@headlessui/react";
+import { useEffect, useState } from "react";
+import CustomButton from "@/components/CustomButton";
 
-export default function Home({ sheetData }: any) {
-  const { today, datas, suppliers } = sheetData;
+const dt = new Date();
+const targetDay = "2023-08-04"; //dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+
+export default function Home({ sheetData, checkers }: any) {
+  const { datas, suppliers } = sheetData;
+  const [checker, setChecker] = useState("미확인");
+  const [content, setContent] = useState(false);
+
   return (
-    <div>
-      <Hero />
-      <div className="mt-12 sm:px-16 px-6 py-4 max-w-[1440px] mx-auto">
-        <section>
-          <p className="text-[20px] text-black-100 font-light mt-5">[{today}]일 기준</p>
-          <div className="grid xl:grid-cols-6 md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 justify-between gap-y-5 text-black-100">
-            {suppliers.map((supplier: any) => {
-              const filteredData = datas.filter((data: SheetData) => data.supplierCode === supplier.supplierId);
-              const orderQuantity = filteredData
-                .map((data: SheetData) => data.orderQuantity ?? 0)
-                .reduce((acc: number, cur: number) => acc + cur, 0);
-              const inQuantity = filteredData
-                .map((data: SheetData) => data.inQuantity ?? 0)
-                .reduce((acc: number, cur: number) => acc + cur, 0);
-              return (
-                <div className="p-8 shadow-lg rounded-xl text-center bg-white" key={supplier.supplierId}>
-                  <h1 className="text-xl font-bold text-black">{supplier.supplierNm}</h1>
-                  <hr className="my-2 border-gray-200 dark:border-gray-700" />
-                  <p className="text-sm text-black">주문수 : {orderQuantity} pcs</p>
-                  <p className="text-sm text-black">입고수 : {inQuantity} pcs</p>
-                  <hr className="my-2 border-gray-200 dark:border-gray-700" />
-                  <p className="text-sm text-gray-500">확인자 : 미확인</p>
-                  <hr className="my-2 border-gray-200 dark:border-gray-700" />
-                  <Link
-                    href={{
-                      pathname: `/${supplier.supplierId}`,
-                      query: { filteredData: JSON.stringify(filteredData) },
-                    }}
-                    as={`/${supplier.supplierId}`}
-                  >
-                    Click
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+    <div className="sm:px-16 px-6">
+      <NavBar name={checker} />
+      <div className="flex-1 pt-36">
+        <h1 className="2xl:text-[72px] sm:text-[64px] text-[50px] font-extrabold">MOOMOOZ Warehouse System!</h1>
+        <p className="text-[27px] text-black-100 font-light mt-5">남대문 입고 상품 확인프로그램</p>
+        <p className="text-[27px] text-black-100 font-light mt-5">기준일: {targetDay}</p>
       </div>
+      <div className="flex pt-5">
+        <RadioGroup value={checker} onChange={setChecker}>
+          <RadioGroup.Label className="text-[27px] text-black-100 font-light mt-5">
+            확인자를 선택해주세요
+          </RadioGroup.Label>
+          <div className="grid xl:grid-cols-6 md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 mt-5 justify-between">
+            {checkers.map((person: string) => (
+              <RadioGroup.Option
+                key={person}
+                value={person}
+                className={({ active, checked }) =>
+                  `${active ? "ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-sky-300" : ""}
+                ${checked ? "bg-sky-900 bg-opacity-75 text-white" : "bg-white"}
+                  relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none`
+                }
+              >
+                {({ active, checked }) => (
+                  <>
+                    <div className="flex items-center">
+                      <div className="text-sm">
+                        <RadioGroup.Label
+                          as="p"
+                          className={`font-medium text-xl  ${checked ? "text-white" : "text-gray-900"}`}
+                        >
+                          {person}
+                        </RadioGroup.Label>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </RadioGroup.Option>
+            ))}
+          </div>
+        </RadioGroup>
+      </div>
+      <CustomButton
+        isDisabled={false}
+        btnType={"button"}
+        title={`[${targetDay}]기준 자료 가져오기`}
+        containerStyles={"bg-blue-500 rounded-lg mt-5"}
+        textStyles={"text-white"}
+        handleClick={() => {
+          checker === "미확인" ? alert("확인자를 선택해주세요") : setContent(true);
+        }}
+      />
+      {content && suppliers.length == 0 ? (
+        <p className="text-[27px] text-red-300 font-light mt-5">데이터가 없습니다. 사무실에 문의해주세요</p>
+      ) : (
+        content && <SupplierList datas={datas} suppliers={suppliers} checker={checker} />
+      )}
     </div>
   );
 }
 
 export async function getServerSideProps() {
-  const sheetData: any = await getInQuantityData();
+  const sheetData: any = await getInQuantityData(targetDay);
+  const checkers: any = await getCheckerList();
   return {
-    props: { sheetData },
+    props: { sheetData, checkers },
   };
 }

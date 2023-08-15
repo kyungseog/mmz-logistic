@@ -1,5 +1,4 @@
 import { google } from "googleapis";
-// import { DateTime } from "luxon";
 
 async function getGoogleApis(range) {
   const target = ["https://www.googleapis.com/auth/spreadsheets.readonly"];
@@ -18,14 +17,12 @@ async function getGoogleApis(range) {
   return response.data.values;
 }
 
-export async function getInQuantityData() {
+export async function getInQuantityData(targetDay) {
   try {
-    const today = "2023-08-03"; //DateTime.now().toFormat("yyyy-Ll-dd");
-
-    const range = "data!A1:M10000";
+    const range = "data!A1:N10000";
     const response = await getGoogleApis(range);
     const datas = response
-      .filter((row) => row[2] === today)
+      .filter((row) => row[2] === targetDay)
       .map((row) => ({
         supplierCode: row[0],
         barCode: row[1],
@@ -38,31 +35,54 @@ export async function getInQuantityData() {
         optionText: row[8],
         inQuantity: Number(row[9]),
         inIssueText: row[10],
-        imageUrl: row[11],
-        productCode: row[12],
+        checker: row[11],
+        imageUrl: row[12],
+        productCode: row[13],
       }));
-
-    const suppliers = datas
-      .map((data) => ({ supplierId: data.supplierCode, supplierNm: data.supplierNm }))
-      .reduce(function (acc, cur) {
-        if (acc.findIndex(({ supplierId }) => supplierId === cur.supplierId) === -1) {
-          acc.push(cur);
-        }
-        return acc;
-      }, []);
-
-    return { today, datas, suppliers };
+    const suppliers = [...new Set(datas.map((data) => data.supplierCode))];
+    return { datas, suppliers };
   } catch (err) {
     console.log(err);
   }
   return [];
 }
 
-export async function getSuppliersData() {
+export async function getIssueList() {
   try {
-    const range = "infoSupplier!A1:B1000";
-    const datas = await getGoogleApis(range);
-    return datas;
+    const range = "infoData!A2:A20";
+    const issueList = await getGoogleApis(range);
+    return issueList;
+  } catch (err) {
+    console.log(err);
+  }
+  return [];
+}
+
+export async function getCheckerList() {
+  try {
+    const range = "infoData!B2:B20";
+    const checkers = await getGoogleApis(range);
+    return checkers;
+  } catch (err) {
+    console.log(err);
+  }
+  return [];
+}
+
+export async function getItemList() {
+  try {
+    const range = "infoItem!B2:F200000";
+    const response = await getGoogleApis(range);
+    const itemList = response
+      .filter((row) => row[1] === "N31MM010B42")
+      .map((row) => ({
+        barCode: row[0],
+        productCode: row[1],
+        optionCode: row[2],
+        productNm: row[3],
+        optionNm: row[4],
+      }));
+    return itemList;
   } catch (err) {
     console.log(err);
   }

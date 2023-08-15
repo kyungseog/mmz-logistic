@@ -1,20 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
 
-import CustomButton from "./CustomButton";
-
-const NavBar = () => (
+const NavBar = ({ name }: any) => (
   <header className="w-full absolute z-10">
-    <nav className="max-w-[1440px] mx-auto flex justify-between items-center sm:px-16 px-6 py-4 bg-transparent">
+    <nav className="max-w-[1440px] flex justify-between items-center py-4 bg-transparent">
       <Link href="/" className="flex justify-center items-center">
         <Image src="/logo_kr_bk.png" alt="logo" width={118} height={18} className="object-contain" />
       </Link>
-
-      <CustomButton
-        title="작성자등록"
-        btnType="button"
-        containerStyles="text-black rounded-full bg-white min-w-[130px]"
-      />
+      <h5 className="text-gray-500 font-normal text-3xl">{name}</h5>
     </nav>
   </header>
 );
