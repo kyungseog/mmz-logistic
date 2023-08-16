@@ -1,16 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { google } from "googleapis";
-
-type ItemList = {
-  barCode: string;
-  productCode: string;
-  optionCode: string;
-  productNm: string;
-  optionNm: string;
-};
+import { ItemList } from "@/types";
 
 async function getGoogleApis(range: string) {
-  const target = ["https://www.googleapis.com/auth/spreadsheets.readonly"];
+  const target = ["https://www.googleapis.com/auth/spreadsheets"];
   const jwt = new google.auth.JWT(
     process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
     undefined,
@@ -28,19 +21,61 @@ async function getGoogleApis(range: string) {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const range = "infoItem!B2:F200000";
-    const response = await getGoogleApis(range);
-    if (response) {
-      const itemList: ItemList[] = response
-        .filter((row: any) => row[1] === req.body.item)
+    const incomingGoodsRange = "incomingGoods!A1:O10000";
+    const infoItemsRange = "infoItems!B2:F200000";
+    const resInfoItems = await getGoogleApis(infoItemsRange);
+    const resIncomingGoods = await getGoogleApis(incomingGoodsRange);
+
+    if (resIncomingGoods && resInfoItems) {
+      const incomingGoods = resIncomingGoods
+        .filter((row) => row[2] === req.body.today && row[13] === req.body.item)
         .map((row) => ({
+          supplierCode: row[0],
+          barCode: row[1],
+          incomingDate: row[2],
+          supplierNm: row[3],
+          productNm: row[4],
+          buyingProductNm: row[5],
+          optionNm: row[6],
+          orderQuantity: Number(row[7]),
+          optionText: row[8],
+          incomingQuantity: Number(row[9]),
+          incomingIssueText: row[10],
+          checker: row[11],
+          imageUrl: row[12],
+          productCode: row[13],
+          optionCode: row[14],
+        }));
+
+      const infoItems: ItemList[] = resInfoItems
+        .filter((row) => row[1] === req.body.item)
+        .map((row) => ({
+          supplierCode: "",
           barCode: row[0],
+          incomingDate: "",
+          supplierNm: "",
+          productNm: row[3],
+          buyingProductNm: "",
+          optionNm: row[4],
+          orderQuantity: 0,
+          optionText: "",
+          incomingQuantity: 0,
+          incomingIssueText: "",
+          checker: "",
+          imageUrl: "",
           productCode: row[1],
           optionCode: row[2],
-          productNm: row[3],
-          optionNm: row[4],
         }));
-      return res.status(200).send(JSON.stringify({ error: false, data: itemList }));
+
+      const result = infoItems.map((item) => {
+        const data = incomingGoods.filter((data) => data.barCode === item.barCode);
+        if (data.length == 0) {
+          return item;
+        } else {
+          return Object.assign(item, data[0]);
+        }
+      });
+      return res.status(200).send(JSON.stringify({ error: false, data: result }));
     }
   } catch (err) {
     console.log(err);

@@ -1,15 +1,15 @@
 import SupplierList from "@/components/SupplierList";
-import { getCheckerList, getInQuantityData } from "@/libs/getGoogleSheets";
+import { getInfoCheckers, getIncomingGoods } from "@/libs/getGoogleSheets";
 import NavBar from "@/components/Navbar";
 import { RadioGroup } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import CustomButton from "@/components/CustomButton";
 
 const dt = new Date();
-const targetDay = "2023-08-04"; //dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+const today = "2023-08-04"; //dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
 
-export default function Home({ sheetData, checkers }: any) {
-  const { datas, suppliers } = sheetData;
+export default function Home({ incomingGoodsData, checkers }: any) {
+  const { incomingGoods, suppliers } = incomingGoodsData;
   const [checker, setChecker] = useState("미확인");
   const [content, setContent] = useState(false);
 
@@ -19,7 +19,7 @@ export default function Home({ sheetData, checkers }: any) {
       <div className="flex-1 pt-36">
         <h1 className="2xl:text-[72px] sm:text-[64px] text-[50px] font-extrabold">MOOMOOZ Warehouse System!</h1>
         <p className="text-[27px] text-black-100 font-light mt-5">남대문 입고 상품 확인프로그램</p>
-        <p className="text-[27px] text-black-100 font-light mt-5">기준일: {targetDay}</p>
+        <p className="text-[27px] text-black-100 font-light mt-5">기준일: {today}</p>
       </div>
       <div className="flex pt-5">
         <RadioGroup value={checker} onChange={setChecker}>
@@ -59,7 +59,7 @@ export default function Home({ sheetData, checkers }: any) {
       <CustomButton
         isDisabled={false}
         btnType={"button"}
-        title={`[${targetDay}]기준 자료 가져오기`}
+        title={`[${today}]기준 자료 가져오기`}
         containerStyles={"bg-blue-500 rounded-lg mt-5"}
         textStyles={"text-white"}
         handleClick={() => {
@@ -69,16 +69,16 @@ export default function Home({ sheetData, checkers }: any) {
       {content && suppliers.length == 0 ? (
         <p className="text-[27px] text-red-300 font-light mt-5">데이터가 없습니다. 사무실에 문의해주세요</p>
       ) : (
-        content && <SupplierList datas={datas} suppliers={suppliers} checker={checker} />
+        content && <SupplierList incomingGoods={incomingGoods} suppliers={suppliers} checker={checker} today={today} />
       )}
     </div>
   );
 }
 
 export async function getServerSideProps() {
-  const sheetData: any = await getInQuantityData(targetDay);
-  const checkers: any = await getCheckerList();
+  const incomingGoodsData: any = await getIncomingGoods(today);
+  const checkers: any = await getInfoCheckers();
   return {
-    props: { sheetData, checkers },
+    props: { incomingGoodsData, checkers },
   };
 }

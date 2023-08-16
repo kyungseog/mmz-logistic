@@ -13,18 +13,20 @@ export interface CustomButtonProps {
   handleClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
-export interface SheetData {
+export type ItemList = {
   supplierCode: string;
   barCode: string;
-  inDate: Date;
+  incomingDate: string;
   supplierNm: string;
   productNm: string;
   buyingProductNm: string;
   optionNm: string;
   orderQuantity: number;
   optionText: string;
-  inQuantity: number;
-  inIssueText: string;
+  incomingQuantity: number;
+  incomingIssueText: string;
+  checker: string;
   imageUrl: string;
   productCode: string;
-}
+  optionCode: string;
+};

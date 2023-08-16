@@ -1,42 +1,39 @@
 import { useRouter } from "next/router";
 import Image from "next/image";
 import NavBar from "@/components/Navbar";
-import { SheetData } from "@/types";
-import { getIssueList, getItemList } from "@/libs/getGoogleSheets";
+import { ItemList } from "@/types";
+import { getInfoIssueLists } from "@/libs/getGoogleSheets";
 import { useEffect, useState } from "react";
-import { headers } from "next/dist/client/components/headers";
 
-export default function Products({ issueList }: any) {
-  const [itemList, setItemLIst] = useState();
+export default function Products({ issueLists }: any) {
+  const [itemLists, setItemLIsts] = useState<ItemList[]>([]);
   const router = useRouter();
-  console.log(router);
+  const productCode: string = typeof router.query.products !== "string" ? "" : router.query.products;
+  const today: string = typeof router.query.today !== "string" ? "2023-01-01" : JSON.parse(router.query.today);
+  const checker: string = typeof router.query.checker !== "string" ? "미확인" : JSON.parse(router.query.checker);
+  const image: string = typeof router.query.image !== "string" ? "" : JSON.parse(router.query.image);
+
   useEffect(() => {
     const fetchData = async () => {
       const req = await fetch("http://localhost:3000/api/googleSheet", {
         method: "POST",
-        body: JSON.stringify({ item: "N31MM010B42" }),
+        body: JSON.stringify({ item: productCode, today: today }),
         headers: {
           "Content-Type": "application/json",
         },
       });
       const res = await req.json();
-      setItemLIst(res.data);
+      setItemLIsts(res.data);
     };
     fetchData();
-  }, []);
+  }, [productCode, today]);
 
   return (
     <div className="sm:px-16 px-6">
-      <NavBar />
+      <NavBar name={checker} />
       <div className="flex-1 pt-36">
         <div className="grid grid-cols-5 text-center">
-          {/* <Image
-            src={itemDatas[0].imageUrl}
-            alt={itemDatas[0].productNm}
-            width={500}
-            height={700}
-            className="col-span-2"
-          /> */}
+          <Image src={image} alt={""} width={500} height={700} className="col-span-2" />
           <table className="table-auto col-span-3">
             <thead className="bg-gray-100 border">
               <tr className="border">
@@ -49,7 +46,7 @@ export default function Products({ issueList }: any) {
               </tr>
             </thead>
             <tbody className="bg-white">
-              {itemList.map((item: SheetData) => {
+              {itemLists.map((item: ItemList) => {
                 return (
                   <tr key={item.barCode} className="hover:bg-gray-100 border">
                     <td className="border">
@@ -70,7 +67,7 @@ export default function Products({ issueList }: any) {
                     <td className="border">
                       <input
                         className="w-24 shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        id="inQuantity"
+                        id="incomingQuantity"
                         type="number"
                         placeholder="0"
                       ></input>
@@ -78,7 +75,7 @@ export default function Products({ issueList }: any) {
                     <td className="border">
                       {
                         <select>
-                          {issueList.map((list: string, index: number) => {
+                          {issueLists.map((list: string, index: number) => {
                             return (
                               <option key={index} value={list}>
                                 {list}
@@ -100,8 +97,8 @@ export default function Products({ issueList }: any) {
 }
 
 export async function getServerSideProps() {
-  const issueList = await getIssueList();
+  const issueLists = await getInfoIssueLists();
   return {
-    props: { issueList },
+    props: { issueLists },
   };
 }

@@ -1,24 +1,25 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
-import { SheetData } from "@/types";
+import { ItemList } from "@/types";
 import NavBar from "@/components/Navbar";
 
 export default function Suppliers() {
   const router = useRouter();
-  if (typeof router.query.filteredData !== "string") {
+  if (typeof router.query.incomingGoodsBySupplier !== "string") {
     return <></>;
   }
-  const filteredData = JSON.parse(router.query.filteredData);
+  const incomingGoodsBySupplier = JSON.parse(router.query.incomingGoodsBySupplier);
   const checker = typeof router.query.checker !== "string" ? "미확인" : JSON.parse(router.query.checker);
-  const products = filteredData.map((row: SheetData) => row.productCode);
+  const today = typeof router.query.today !== "string" ? "2023-01-01" : JSON.parse(router.query.today);
+  const products = incomingGoodsBySupplier.map((row: ItemList) => row.productCode);
   const uniqueProducts = products.filter((product: string, index: number) => products.indexOf(product) === index);
 
-  const totalOrderQuantity = filteredData
-    .map((data: SheetData) => data.orderQuantity ?? 0)
+  const totalOrderQuantity = incomingGoodsBySupplier
+    .map((data: ItemList) => data.orderQuantity ?? 0)
     .reduce((acc: number, cur: number) => acc + cur, 0);
-  const totalInQuantity = filteredData
-    .map((data: SheetData) => data.inQuantity ?? 0)
+  const totalInQuantity = incomingGoodsBySupplier
+    .map((data: ItemList) => data.incomingQuantity ?? 0)
     .reduce((acc: number, cur: number) => acc + cur, 0);
 
   return (
@@ -27,7 +28,7 @@ export default function Suppliers() {
       <div className="flex xl:flex-row flex-col gap-5 relative z-0 max-w-[1440px]">
         <div className="flex-1 pt-36">
           <h1 className="text-[30px] font-extrabold">
-            [{filteredData[0].supplierNm}]
+            [{incomingGoodsBySupplier[0].supplierNm}]
             <span className="font-normal ms-3">
               주문상품수: {totalOrderQuantity} pcs / 확인완료수: {totalInQuantity} pcs{" "}
             </span>
@@ -38,13 +39,14 @@ export default function Suppliers() {
         <section>
           <div className="grid xl:grid-cols-4 md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-4 justify-between text-black-100">
             {uniqueProducts.map((product: any) => {
-              const selectData = filteredData.filter((data: SheetData) => data.productCode === product);
+              const selectData = incomingGoodsBySupplier.filter((data: ItemList) => data.productCode === product);
               const orderQuantity = selectData
-                .map((data: SheetData) => data.orderQuantity ?? 0)
+                .map((data: ItemList) => data.orderQuantity ?? 0)
                 .reduce((acc: number, cur: number) => acc + cur, 0);
               const inQuantity = selectData
-                .map((data: SheetData) => data.inQuantity ?? 0)
+                .map((data: ItemList) => data.incomingQuantity ?? 0)
                 .reduce((acc: number, cur: number) => acc + cur, 0);
+
               return (
                 <div className="p-4 shadow-lg rounded-xl text-center bg-white" key={selectData[0].productCode}>
                   <div className="flex">
@@ -67,9 +69,12 @@ export default function Suppliers() {
                   <Link
                     href={{
                       pathname: `/${selectData[0].supplierCode}/${selectData[0].productCode}`,
-                      query: { itemData: JSON.stringify(selectData), checker: JSON.stringify(checker) },
+                      query: {
+                        checker: JSON.stringify(checker),
+                        today: JSON.stringify(today),
+                        image: JSON.stringify(selectData[0].imageUrl),
+                      },
                     }}
-                    as={`/${selectData[0].supplierCode}/${selectData[0].productCode}`}
                   >
                     Click
                   </Link>
