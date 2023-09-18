@@ -50,7 +50,7 @@ export async function getIncomingGoods(today) {
 
 export async function getInfoIssueLists() {
   try {
-    const range = "infoIssueLists!A2:A20";
+    const range = "infoLists!C2:C20";
     const issueLists = await getGoogleApis(range);
     return issueLists;
   } catch (err) {
@@ -61,7 +61,7 @@ export async function getInfoIssueLists() {
 
 export async function getInfoCheckers() {
   try {
-    const range = "infoCheckers!A2:A20";
+    const range = "infoLists!A2:A20";
     const checkers = await getGoogleApis(range);
     return checkers;
   } catch (err) {
