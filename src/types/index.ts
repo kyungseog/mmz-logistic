@@ -26,6 +26,7 @@ export type ItemList = {
   incomingQuantity: number;
   incomingIssueText: string;
   checker: string;
+  notYetIncome: number;
   imageUrl: string;
   productCode: string;
   optionCode: string;

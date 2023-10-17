@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import CustomButton from "@/components/CustomButton";
 
 const dt = new Date();
-const today = "2023-08-04"; //dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+const today = "2023-09-19"; //dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
 
 export default function Home({ incomingGoodsData, checkers }: any) {
   const { incomingGoods, suppliers } = incomingGoodsData;

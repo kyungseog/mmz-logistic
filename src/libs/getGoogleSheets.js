@@ -19,7 +19,7 @@ async function getGoogleApis(range) {
 
 export async function getIncomingGoods(today) {
   try {
-    const incomingGoodsRange = "incomingGoods!A1:O10000";
+    const incomingGoodsRange = "incomingGoods!A1:P30000";
     const resIncomingGoods = await getGoogleApis(incomingGoodsRange);
     const incomingGoods = resIncomingGoods
       .filter((row) => row[2] === today)
@@ -36,9 +36,10 @@ export async function getIncomingGoods(today) {
         incomingQuantity: Number(row[9]),
         incomingIssueText: row[10],
         checker: row[11],
-        imageUrl: row[12],
-        productCode: row[13],
-        optionCode: row[14],
+        notYetIncome: row[12],
+        imageUrl: row[13],
+        productCode: row[14],
+        optionCode: row[15],
       }));
     const suppliers = [...new Set(incomingGoods.map((data) => data.supplierCode))];
     return { incomingGoods, suppliers };
